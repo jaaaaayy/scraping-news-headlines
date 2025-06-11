@@ -13,7 +13,9 @@ export async function scrapeArticles(url: string): Promise<Article[]> {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error("Failed to scrape the website.");
+    throw new Error(
+      "An unexpected error occurred while processing the request."
+    );
   }
 
   const html = await response.text();
@@ -52,6 +54,7 @@ export async function scrapeArticles(url: string): Promise<Article[]> {
               headline,
               url: articleUrl,
               element: $el,
+              source,
             })
           );
         }
@@ -71,6 +74,7 @@ export async function scrapeArticles(url: string): Promise<Article[]> {
       createArticleObject({
         headline,
         element: $el,
+        source,
       })
     );
   }
@@ -79,17 +83,19 @@ export async function scrapeArticles(url: string): Promise<Article[]> {
     headline,
     url,
     element,
+    source,
   }: {
     headline: string;
     url?: string;
     element: cheerio.Cheerio<Element>;
+    source: string;
   }): Article {
     const $el = element;
     const articleUrl = url || $el.find("a").first().attr("href") || "";
 
     return {
       headline,
-      url: makeAbsoluteUrl(articleUrl, url ?? ""),
+      url: makeAbsoluteUrl(articleUrl, source),
       author: extractAuthor($el),
       publicationDate: extractPublicationDate($el),
       source,

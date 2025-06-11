@@ -7,7 +7,19 @@ export async function GET(request: NextRequest) {
 
   if (!url) {
     return NextResponse.json(
-      { error: "URL parameter is required." },
+      { error: "The 'url' query parameter is required." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    new URL(url);
+  } catch {
+    return NextResponse.json(
+      {
+        error:
+          "The provided URL is not valid. Please ensure it includes the protocol (e.g., 'https://').",
+      },
       { status: 400 }
     );
   }
@@ -24,10 +36,5 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    return NextResponse.json(
-      { error: "Unknown error occurred during scraping." },
-      { status: 500 }
-    );
   }
 }

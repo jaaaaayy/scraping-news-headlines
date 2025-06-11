@@ -3,47 +3,88 @@ import type { Element } from "domhandler";
 import { Article } from "@/types";
 
 export function extractHeadline($el: cheerio.Cheerio<Element>): string | null {
-  return (
-    $el.find("h1, h2, h3").first().text().trim() ||
-    $el.find('[class*="title"], [class*="headline"]').first().text().trim() ||
-    $el.attr("aria-label") ||
-    null
-  );
+  const candidates = [
+    "h1",
+    "h2",
+    "h3",
+    '[class*="headline"]',
+    '[class*="title"]',
+    '[itemprop="headline"]',
+    '[property="og:title"]',
+    'meta[name="title"]',
+    'meta[property="og:title"]',
+    '[data-testid*="headline"]',
+  ];
+
+  for (const selector of candidates) {
+    const text = selector.startsWith("meta")
+      ? $el.find(selector).attr("content")
+      : $el.find(selector).first().text().trim();
+    if (text) return text;
+  }
+
+  return $el.attr("aria-label") || null;
 }
 
 export function extractAuthor($el: cheerio.Cheerio<Element>): string {
-  return (
-    $el.find('[class*="author"], [class*="byline"]').first().text().trim() ||
-    $el
-      .find('meta[name="author"], meta[property="article:author"]')
-      .attr("content") ||
-    "Unknown"
-  );
+  const candidates = [
+    '[class*="author"]',
+    '[class*="byline"]',
+    '[itemprop="author"]',
+    '[rel="author"]',
+    'meta[name="author"]',
+    'meta[property="article:author"]',
+    'meta[name="parsely-author"]',
+    '[class*="writer"]',
+    '[data-testid*="author"]',
+  ];
+
+  for (const selector of candidates) {
+    const text = selector.startsWith("meta")
+      ? $el.find(selector).attr("content")
+      : $el.find(selector).first().text().trim();
+    if (text) return text;
+  }
+
+  return "Unknown";
 }
 
 export function extractPublicationDate($el: cheerio.Cheerio<Element>): string {
-  return (
-    $el.find("time").attr("datetime") ||
-    $el
-      .find('[class*="date"], [class*="time"], [class*="published"]')
-      .first()
-      .text()
-      .trim() ||
-    $el
-      .find(
-        'meta[property="article:published_time"], meta[name="pubdate"], meta[name="date"]'
-      )
-      .attr("content") ||
-    "Not specified"
-  );
+  const candidates = [
+    "time",
+    '[class*="date"]',
+    '[class*="time"]',
+    '[class*="published"]',
+    '[itemprop*="date"]',
+    "[datetime]",
+    'meta[property="article:published_time"]',
+    'meta[name="pubdate"]',
+    'meta[name="date"]',
+    'meta[itemprop="datePublished"]',
+    '[data-testid*="date"]',
+  ];
+
+  for (const selector of candidates) {
+    const value =
+      selector.startsWith("meta") || selector === "time"
+        ? $el.find(selector).attr("datetime") ||
+          $el.find(selector).attr("content")
+        : $el.find(selector).first().text().trim();
+    if (value) return value;
+  }
+
+  return "Not specified";
 }
 
 export function makeAbsoluteUrl(relativeUrl: string, baseUrl: string): string {
-  if (!relativeUrl) return baseUrl;
+  if (!relativeUrl) return normalizeBaseUrl(baseUrl);
+
+  const safeBaseUrl = normalizeBaseUrl(baseUrl);
+
   try {
-    return new URL(relativeUrl, baseUrl).href;
+    return new URL(relativeUrl, safeBaseUrl).href;
   } catch {
-    return relativeUrl.startsWith("http") ? relativeUrl : baseUrl;
+    return relativeUrl.startsWith("http") ? relativeUrl : safeBaseUrl;
   }
 }
 
@@ -54,4 +95,14 @@ export function removeDuplicateArticles(articles: Article[]): Article[] {
     seenUrls.add(article.url);
     return true;
   });
+}
+
+function normalizeBaseUrl(url: string): string {
+  if (!url) return "";
+
+  if (/^https?:\/\//i.test(url)) return url;
+
+  const cleaned = url.replace(/^\/+/, "");
+
+  return `https://${cleaned}`;
 }
