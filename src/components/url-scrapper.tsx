@@ -1,9 +1,9 @@
 "use client";
 
-import { scrape } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useScrapeUrl } from "@/hooks/useScrapeUrl";
 import { Article } from "@/types";
 import { AlertCircleIcon, LoaderCircle } from "lucide-react";
 import { useState } from "react";
@@ -17,6 +17,8 @@ export default function UrlScraper() {
   const [success, setSuccess] = useState(false);
   const [articles, setArticles] = useState<Article[]>([]);
 
+  const { scrapeUrl } = useScrapeUrl();
+
   async function handleScrape() {
     if (!url.trim()) {
       setError("Please enter a URL.");
@@ -28,7 +30,7 @@ export default function UrlScraper() {
     setArticles([]);
 
     try {
-      const data = await scrape(url);
+      const data = await scrapeUrl(url);
       setArticles(data);
       setSuccess(true);
     } catch (error: unknown) {
