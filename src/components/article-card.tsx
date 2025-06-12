@@ -29,16 +29,18 @@ export function ArticleCard({ article }: { article: Article }) {
       <CardHeader>
         <div className="flex justify-between items-start">
           <Badge variant="outline">{source}</Badge>
-          <Button variant="ghost" size="icon" asChild>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open article"
-            >
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
+          {url && (
+            <Button variant="ghost" size="icon" asChild>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open article"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          )}
         </div>
         <CardTitle>{headline}</CardTitle>
       </CardHeader>
@@ -55,11 +57,13 @@ export function ArticleCard({ article }: { article: Article }) {
         </div>
       </CardContent>
       <CardFooter className="border-t">
-        <Button variant="link" className="p-0" asChild>
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            Read full article
-          </a>
-        </Button>
+        {url && (
+          <Button variant="link" className="p-0" asChild>
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              Read full article
+            </a>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

@@ -1,5 +1,7 @@
 "use server";
 
+import { Article } from "./types";
+
 export async function scrape(url: string) {
   const response = await fetch(
     `http://localhost:3000/api/scrape?url=${encodeURIComponent(url)}`
@@ -7,11 +9,10 @@ export async function scrape(url: string) {
 
   if (!response.ok) {
     const { error } = await response.json();
-    console.log(error);
     throw new Error(error);
   }
 
-  const data = await response.json();
+  const data: Article[] = await response.json();
 
   return data;
 }

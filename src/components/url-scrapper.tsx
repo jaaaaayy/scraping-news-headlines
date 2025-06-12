@@ -14,6 +14,7 @@ export default function UrlScraper() {
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [articles, setArticles] = useState<Article[]>([]);
 
   async function handleScrape() {
@@ -24,13 +25,16 @@ export default function UrlScraper() {
 
     setIsLoading(true);
     setError("");
+    setArticles([]);
 
     try {
       const data = await scrape(url);
       setArticles(data);
+      setSuccess(true);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message);
+        setSuccess(false);
       }
     } finally {
       setIsLoading(false);
@@ -70,7 +74,7 @@ export default function UrlScraper() {
           )}
         </CardContent>
       </Card>
-      <ArticleList articles={articles} />
+      {!isLoading && success && <ArticleList articles={articles} />}
     </div>
   );
 }
