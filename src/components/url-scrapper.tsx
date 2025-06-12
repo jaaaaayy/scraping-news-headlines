@@ -4,18 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useScrapeUrl } from "@/hooks/useScrapeUrl";
-import { Article } from "@/types";
-import { AlertCircleIcon, LoaderCircle } from "lucide-react";
+import { News } from "@/types";
+import { AlertCircleIcon, LoaderCircle, Search } from "lucide-react";
 import { useState } from "react";
-import ArticleList from "./article-list";
 import { Alert, AlertTitle } from "./ui/alert";
+import NewsList from "./news-list";
 
 export default function UrlScraper() {
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [news, setNews] = useState<News[]>([]);
 
   const { scrapeUrl } = useScrapeUrl();
 
@@ -27,11 +27,11 @@ export default function UrlScraper() {
 
     setIsLoading(true);
     setError("");
-    setArticles([]);
+    setNews([]);
 
     try {
       const data = await scrapeUrl(url);
-      setArticles(data);
+      setNews(data);
       setSuccess(true);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -64,7 +64,10 @@ export default function UrlScraper() {
                   <span>Scraping...</span>
                 </div>
               ) : (
-                "Scrape"
+                <>
+                  <Search />
+                  <span>Scrape</span>
+                </>
               )}
             </Button>
           </div>
@@ -76,7 +79,7 @@ export default function UrlScraper() {
           )}
         </CardContent>
       </Card>
-      {!isLoading && success && <ArticleList articles={articles} />}
+      {!isLoading && success && <NewsList news={news} />}
     </div>
   );
 }

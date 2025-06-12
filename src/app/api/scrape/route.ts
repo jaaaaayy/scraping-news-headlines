@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
-import { Article } from "@/types";
+import { News } from "@/types";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -37,14 +37,14 @@ export async function GET(request: NextRequest) {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    const articles: Article[] = [];
+    const news: News[] = [];
 
     const baseUrl = new URL(url);
     const seen = new Set<string>();
 
     $(
-      `article, 
-      [class*="article" i], 
+      `news, 
+      [class*="news" i], 
       [class*="post" i], 
       [class*="story" i], 
       [class*="card" i], 
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
         }
 
         seen.add(headline);
-        articles.push({
+        news.push({
           headline,
           url: absoluteUrl,
           author,
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    return NextResponse.json(articles);
+    return NextResponse.json(news);
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json(

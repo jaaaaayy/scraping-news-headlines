@@ -7,11 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Article } from "@/types";
+import { News } from "@/types";
 import { Calendar, ExternalLink, UserRound } from "lucide-react";
 
-export function ArticleCard({ article }: { article: Article }) {
-  const { headline, url, author, publicationDate, source } = article;
+export function NewsCard({ news }: { news: News }) {
+  const { headline, url, author, publicationDate, source } = news;
 
   let formattedDate;
   if (publicationDate && !isNaN(new Date(publicationDate).getTime())) {
@@ -35,7 +35,7 @@ export function ArticleCard({ article }: { article: Article }) {
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Open article"
+                aria-label="Open news"
               >
                 <ExternalLink className="h-4 w-4" />
               </a>
@@ -60,7 +60,7 @@ export function ArticleCard({ article }: { article: Article }) {
         {url && (
           <Button variant="link" className="p-0" asChild>
             <a href={url} target="_blank" rel="noopener noreferrer">
-              Read full article
+              Read full news
             </a>
           </Button>
         )}

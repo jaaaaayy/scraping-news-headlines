@@ -1,4 +1,4 @@
-export type Article = {
+export type News = {
   headline: string;
   url?: string;
   author: string;

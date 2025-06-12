@@ -1,15 +1,15 @@
 import { FileX } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 
-const NoArticleFound = () => {
+const NoNewsFound = () => {
   return (
     <Card>
       <CardContent className="flex flex-col items-center justify-center gap-2 h-24">
         <FileX className="size-8" />
-        <span>No Article Found</span>
+        <span>No news Found</span>
       </CardContent>
     </Card>
   );
 };
 
-export default NoArticleFound;
+export default NoNewsFound;
